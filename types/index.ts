@@ -1,10 +1,9 @@
 export interface Hymn {
-  id: string;
+  _id: string;
   title: string;
-  sortOrder: number;
+  sort_order: number | null;
   category?: string;
   author?: string;
-  createdAt?: string;
 }
 
 export type SortField = "sortOrder" | "title";
@@ -15,4 +14,15 @@ export interface HymnFilters {
   category: string;
   sortField: SortField;
   sortDirection: SortDirection;
+}
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  name: string;
+  token: string;
+  role: string;
 }

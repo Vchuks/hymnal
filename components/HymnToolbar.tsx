@@ -1,16 +1,26 @@
 "use client";
 
 import { useHymnStore } from "@/store/hymnStore";
-import { useHymns } from "@/lib/queries";
-import { CATEGORIES } from "@/lib/api";
+import { useGetCategory, useHymns } from "@/lib/queries";
 import { Search, Plus, SlidersHorizontal } from "lucide-react";
+import { useCategoryList, useCategoryStore } from "@/store/categoryStore";
+import { useAuthStore } from "@/store/userStore";
+
 
 export default function HymnToolbar() {
   const { filters, setSearch, setCategory, openCreateModal } = useHymnStore();
+  const { openCategory } = useCategoryStore();
   const { data: hymns = [] } = useHymns();
+  const { user } = useAuthStore();
 
-  const categoryCounts = CATEGORIES.reduce<Record<string, number>>((acc, cat) => {
-    acc[cat] = cat === "All" ? hymns.length : hymns.filter((h) => h.category === cat).length;
+  useGetCategory();
+  const category = useCategoryList();
+
+  const categoryCounts = category.reduce<Record<string, number>>((acc, cat) => {
+    acc[cat] =
+      cat === "all"
+        ? hymns.length
+        : hymns.filter((h) => h.category === cat).length;
     return acc;
   }, {});
 
@@ -37,58 +47,93 @@ export default function HymnToolbar() {
             }}
           />
         </div>
-
-        <button
-          onClick={openCreateModal}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap"
-          style={{
-            background: "var(--gold)",
-            color: "white",
-            border: "none",
-            boxShadow: "0 2px 8px rgba(201,168,76,0.35)",
-          }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLElement).style.background = "var(--gold-dark)")
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLElement).style.background = "var(--gold)")
-          }
-        >
-          <Plus size={16} />
-          Add Hymn
-        </button>
+        {user?.role === "admin" && (
+          <>
+            <button
+              onClick={openCategory}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap"
+              style={{
+                background: "var(--gold)",
+                color: "white",
+                border: "none",
+                boxShadow: "0 2px 8px rgba(201,168,76,0.35)",
+              }}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLElement).style.background =
+                  "var(--gold-dark)")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLElement).style.background =
+                  "var(--gold)")
+              }
+            >
+              <Plus size={16} />
+              Add Category
+            </button>
+            <button
+              onClick={openCreateModal}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap"
+              style={{
+                background: "var(--gold)",
+                color: "white",
+                border: "none",
+                boxShadow: "0 2px 8px rgba(201,168,76,0.35)",
+              }}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLElement).style.background =
+                  "var(--gold-dark)")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLElement).style.background =
+                  "var(--gold)")
+              }
+            >
+              <Plus size={16} />
+              Add Hymn
+            </button>
+          </>
+        )}
       </div>
 
       {/* Category pills */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <SlidersHorizontal size={13} style={{ color: "var(--ink-faint)" }} />
-        {CATEGORIES.map((cat) => {
-          const active = filters.category === cat;
-          return (
-            <button
-              key={cat}
-              onClick={() => setCategory(cat)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all"
-              style={{
-                background: active ? "var(--gold)" : "white",
-                color: active ? "white" : "var(--ink-muted)",
-                border: `1px solid ${active ? "var(--gold)" : "var(--rule)"}`,
-              }}
-            >
-              {cat}
-              <span
-                className="rounded-full px-1.5 py-0.5 text-xs"
+      <div className="flex items-baseline gap-2">
+        <div className="w-fit">
+          <SlidersHorizontal size={17} style={{ color: "var(--ink-faint)" }} />
+        </div>
+        <div className={`flex items-center gap-2 md:flex-wrap w-full max-w-[30rem] md:max-w-full overflow-x-auto`}>
+          {category.map((cat, idx) => {
+            const active = filters.category === cat;
+            return (
+              <button
+                key={idx}
+                onClick={() => setCategory(cat)}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs capitalize font-medium transition-all"
                 style={{
-                  background: active ? "rgba(255,255,255,0.25)" : "var(--parchment-dark)",
-                  color: active ? "white" : "var(--ink-faint)",
-                  fontSize: "10px",
+                  background: active ? "var(--gold)" : "white",
+                  color: active ? "white" : "var(--ink-muted)",
+                  border: `1px solid ${active ? "var(--gold)" : "var(--rule)"}`,
                 }}
               >
-                {categoryCounts[cat] ?? 0}
-              </span>
-            </button>
-          );
-        })}
+                {cat}
+                <span
+                  className="rounded-full px-1.5 py-0.5 text-xs"
+                  style={{
+                    background: active
+                      ? "rgba(255,255,255,0.25)"
+                      : "var(--parchment-dark)",
+                    color: active ? "white" : "var(--ink-faint)",
+                    fontSize: "10px",
+                  }}
+                >
+                  {categoryCounts[cat] ?? 0}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+       
+       
+       
       </div>
     </div>
   );

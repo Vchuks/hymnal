@@ -3,19 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import { useHymnStore } from "@/store/hymnStore";
 import { useCreateHymn, useDeleteHymn, useUpdateHymn } from "@/lib/queries";
-import { CATEGORIES } from "@/lib/api";
 import { X } from "lucide-react";
+import { useCategoryList } from "@/store/categoryStore";
+import { Hymn } from "@/types";
 
 export default function HymnModal() {
   const { isModalOpen, modalMode, selectedHymn, closeModal } = useHymnStore();
   const createHymn = useCreateHymn();
   const updateHymn = useUpdateHymn();
   const deleteHymn = useDeleteHymn();
+  const category = useCategoryList()
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<Omit<Hymn, "_id">>({
+
     title: "",
-    sortOrder: 0,
-    category: "Praise",
+    sort_order: 0,
+    category: "",
     author: "",
   });
 
@@ -26,12 +29,12 @@ export default function HymnModal() {
       if (modalMode === "edit" && selectedHymn) {
         setForm({
           title: selectedHymn.title,
-          sortOrder: selectedHymn.sortOrder,
+          sort_order: selectedHymn.sort_order,
           category: selectedHymn.category ?? "Praise",
           author: selectedHymn.author ?? "",
         });
       } else if (modalMode === "create") {
-        setForm({ title: "", sortOrder: 0, category: "Praise", author: "" });
+        setForm({ title: "", sort_order: null, category: "entrance", author: "" });
       }
       setTimeout(() => firstInput.current?.focus(), 50);
     }
@@ -48,12 +51,12 @@ export default function HymnModal() {
         if (!form.title.trim()) return;
 
         if (modalMode === "edit" && selectedHymn) {
-          await updateHymn.mutateAsync({ id: selectedHymn.id, data: form });
+          await updateHymn.mutateAsync({ id: selectedHymn._id, data: form });
         } else if (modalMode === "create") {
           await createHymn.mutateAsync(form);
         }
       } else {
-        const deleteId = selectedHymn?.id;
+        const deleteId = selectedHymn?._id;
         if (deleteId) deleteHymn.mutate(deleteId);
       }
       closeModal();
@@ -147,14 +150,14 @@ export default function HymnModal() {
                   </label>
                   <input
                     type="number"
-                    value={form.sortOrder}
+                    value={form.sort_order === null ? 0 : form.sort_order}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
-                        sortOrder: parseInt(e.target.value) || 0,
+                        sort_order: parseInt(e.target.value) || null,
                       }))
                     }
-                    min={1}
+                    min={0}
                     className="w-full rounded-lg px-3 py-2.5 text-sm"
                     style={{
                       background: "white",
@@ -182,8 +185,8 @@ export default function HymnModal() {
                       color: "var(--ink)",
                     }}
                   >
-                    {CATEGORIES.filter((c) => c !== "All").map((cat) => (
-                      <option key={cat}>{cat}</option>
+                    {category.filter((c) => c !== "all").map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
                 </div>

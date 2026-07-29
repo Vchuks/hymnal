@@ -5,12 +5,12 @@ import { BookOpen, Music2, Star } from "lucide-react";
 
 export default function HymnStats() {
   const { data: hymns = [], isLoading } = useHymns();
-
+  
   if (isLoading) return null;
 
   const total = hymns.length;
   const categories = new Set(hymns.map((h) => h.category)).size;
-  const highest = hymns.reduce((max, h) => Math.max(max, h.sortOrder), 0);
+  const highest = hymns.reduce((max, h) => Math.max(max, h.sort_order ?? 0), 0);
 
   const stats = [
     { icon: BookOpen, label: "Total Hymns", value: total },
@@ -30,7 +30,7 @@ export default function HymnStats() {
             className="w-6 h-6 md:w-9 md:h-9 rounded-lg hidden md:flex items-center justify-center flex-shrink-0 "
             style={{ background: "var(--parchment-dark)" }}
           >
-            <Icon size={16}  style={{ color: "var(--gold-dark)" }} />
+            <Icon size={16} style={{ color: "var(--gold-dark)" }} />
           </div>
           <div className="m-auto md:m-0">
             <p
@@ -39,7 +39,10 @@ export default function HymnStats() {
             >
               {value}
             </p>
-            <p className="text-center md:text-left text-xs mt-0.5" style={{ color: "var(--ink-faint)" }}>
+            <p
+              className="text-center md:text-left text-xs mt-0.5"
+              style={{ color: "var(--ink-faint)" }}
+            >
               {label}
             </p>
           </div>

@@ -1,46 +1,176 @@
-import { Hymn } from "@/types";
+import { apiHeader, baseUrl } from "@/constants/config";
+import { Hymn, LoginResponse } from "@/types";
+import { toast } from "react-toastify";
+import { EachCategory } from "@/store/categoryStore";
 
-export const mockHymns: Hymn[] = [
-  { id: "1", title: "Hallelujah", sortOrder: 10, category: "Praise", author: "Leonard Cohen" },
-  { id: "2", title: "Amazing Grace", sortOrder: 20, category: "Classic", author: "John Newton" },
-  { id: "3", title: "How Great Thou Art", sortOrder: 30, category: "Worship", author: "Carl Boberg" },
-  { id: "4", title: "Great Is Thy Faithfulness", sortOrder: 40, category: "Classic", author: "Thomas Chisholm" },
-  { id: "5", title: "It Is Well With My Soul", sortOrder: 50, category: "Classic", author: "Horatio Spafford" },
-  { id: "6", title: "Holy, Holy, Holy", sortOrder: 60, category: "Praise", author: "Reginald Heber" },
-  { id: "7", title: "Blessed Assurance", sortOrder: 70, category: "Assurance", author: "Fanny Crosby" },
-  { id: "8", title: "To God Be the Glory", sortOrder: 80, category: "Praise", author: "Fanny Crosby" },
-  { id: "9", title: "Crown Him with Many Crowns", sortOrder: 90, category: "Worship", author: "Matthew Bridges" },
-  { id: "10", title: "Be Thou My Vision", sortOrder: 100, category: "Classic", author: "Dallan Forgaill" },
-  { id: "11", title: "Rock of Ages", sortOrder: 110, category: "Classic", author: "Augustus Toplady" },
-  { id: "12", title: "Abide With Me", sortOrder: 120, category: "Comfort", author: "Henry Lyte" },
-  { id: "13", title: "O For a Thousand Tongues", sortOrder: 130, category: "Praise", author: "Charles Wesley" },
-  { id: "14", title: "What a Friend We Have in Jesus", sortOrder: 140, category: "Comfort", author: "Joseph Scriven" },
-  { id: "15", title: "Fairest Lord Jesus", sortOrder: 150, category: "Worship", author: "Anonymous" },
-];
+export async function loginUser(
+  username: string,
+  password: string,
+): Promise<LoginResponse> {
+  const res = await fetch(`${baseUrl}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  });
+  if (!res.ok) throw new Error("Login failed!");
+  const data = await res.json();
+  localStorage.setItem("user", JSON.stringify(data));
+  return data;
+}
+
+// export async function updateAdminUser(){
+
+// }
 
 export async function fetchHymns(): Promise<Hymn[]> {
-  await new Promise((r) => setTimeout(r, 400));
-  return mockHymns;
+  const res = await fetch(`${baseUrl}/hymn`, {
+    method: "GET",
+    headers: apiHeader(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || `Failed to fetch hymn: ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data;
 }
 
-export async function createHymn(data: Omit<Hymn, "id" | "createdAt">): Promise<Hymn> {
-  await new Promise((r) => setTimeout(r, 300));
-  return {
-    ...data,
-    id: Math.random().toString(36).slice(2),
-    createdAt: new Date().toISOString(),
-  };
+export async function createHymn(data: Omit<Hymn, "_id">): Promise<Hymn> {
+  const res = await fetch(`${baseUrl}/hymn`, {
+    method: "POST",
+    headers: apiHeader(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to create hymn: ${res.status}`,
+    );
+  }
+
+  const result = await res.json();
+  if (result.message) {
+    toast.success(result.message, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  } else {
+    toast.error(result);
+  }
+  return result;
 }
 
-export async function updateHymn(id: string, data: Partial<Hymn>): Promise<Hymn> {
-  await new Promise((r) => setTimeout(r, 300));
-  const hymn = mockHymns.find((h) => h.id === id);
-  if (!hymn) throw new Error("Hymn not found");
-  return { ...hymn, ...data };
+export async function updateHymn(
+  id: string,
+  data: Partial<Hymn>,
+): Promise<Hymn> {
+  const res = await fetch(`${baseUrl}/hymn/${id}`, {
+    method: "PUT",
+    headers: apiHeader(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to update hymn: ${res.status}`,
+    );
+  }
+
+  const result = await res.json();
+  if (result.message) {
+    toast.success(result.message, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  } else {
+    toast.error(result);
+  }
+  return result;
 }
 
 export async function deleteHymn(id: string): Promise<void> {
-  await new Promise((r) => setTimeout(r, 250));
+   const res = await fetch(`${baseUrl}/hymn/${id}`, {
+    method: "DELETE",
+    headers: apiHeader(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to delete hymn: ${res.status}`,
+    );
+  }
+
+  const result = await res.json();
+  if (result.message) {
+    toast.success(result.message, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  } else {
+    toast.error(result);
+  }
+  return result;
 }
 
-export const CATEGORIES = ["All", "Praise", "Classic", "Worship", "Comfort", "Assurance"];
+export async function createCategory(data: Omit<EachCategory, "_id">) {
+  const res = await fetch(`${baseUrl}/category`, {
+    method: "POST",
+    headers: apiHeader(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to create category: ${res.status}`,
+    );
+  }
+
+  const result = await res.json();
+  if (result.message) {
+    toast.success(result.message, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  } else {
+    toast.error(result);
+  }
+  return result;
+}
+
+export async function getCategories() {
+  const res = await fetch(`${baseUrl}/category`, {
+    method: "GET",
+    headers: apiHeader(),
+  });
+  if (!res.ok) throw new Error();
+  const data = await res.json();
+  return data;
+}
+
+export async function deleteCategory(id: string): Promise<void> {
+   const res = await fetch(`${baseUrl}/category/${id}`, {
+    method: "DELETE",
+    headers: apiHeader(),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to delete category: ${res.status}`,
+    );
+  }
+
+  const result = await res.json();
+  if (result.message) {
+    toast.success(result.message, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  } else {
+    toast.error(result);
+  }
+  return result;
+}
