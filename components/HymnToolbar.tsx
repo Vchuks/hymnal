@@ -9,7 +9,7 @@ import { useAuthStore } from "@/store/userStore";
 
 export default function HymnToolbar() {
   const { filters, setSearch, setCategory, openCreateModal } = useHymnStore();
-  const { openCategory } = useCategoryStore();
+  const { openCreateModal: openCat } = useCategoryStore();
   const { data: hymns = [] } = useHymns();
   const { user } = useAuthStore();
 
@@ -27,8 +27,8 @@ export default function HymnToolbar() {
   return (
     <div className="flex flex-col gap-4">
       {/* Search + Add */}
-      <div className="flex gap-3 items-center">
-        <div className="relative flex-1">
+      <div className="flex flex-col md:flex-row gap-3 items-center">
+        <div className="relative flex-1 w-full">
           <Search
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -48,9 +48,9 @@ export default function HymnToolbar() {
           />
         </div>
         {user?.role === "admin" && (
-          <>
+          <div className="flex justify-between gap-4 w-full md:w-auto">
             <button
-              onClick={openCategory}
+              onClick={openCat}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap"
               style={{
                 background: "var(--gold)",
@@ -91,17 +91,15 @@ export default function HymnToolbar() {
               <Plus size={16} />
               Add Hymn
             </button>
-          </>
+          </div>
         )}
       </div>
 
       {/* Category pills */}
       <div className="flex items-baseline gap-2">
-        <div className="w-fit">
-          <SlidersHorizontal size={17} style={{ color: "var(--ink-faint)" }} />
-        </div>
+        
         <div className={`flex items-center gap-2 md:flex-wrap w-full max-w-[30rem] md:max-w-full overflow-x-auto`}>
-          {category.map((cat, idx) => {
+          {category.sort().map((cat, idx) => {
             const active = filters.category === cat;
             return (
               <button

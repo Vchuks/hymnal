@@ -1,15 +1,19 @@
 "use client";
 
-import { useHymns } from "@/lib/queries";
+import { useGetCategory, useHymns } from "@/lib/queries";
+import { useCategoryList } from "@/store/categoryStore";
 import { BookOpen, Music2, Star } from "lucide-react";
 
 export default function HymnStats() {
   const { data: hymns = [], isLoading } = useHymns();
   
+    useGetCategory();
+    const category = useCategoryList();
+  
   if (isLoading) return null;
 
   const total = hymns.length;
-  const categories = new Set(hymns.map((h) => h.category)).size;
+  const categories = category.length - 1
   const highest = hymns.reduce((max, h) => Math.max(max, h.sort_order ?? 0), 0);
 
   const stats = [

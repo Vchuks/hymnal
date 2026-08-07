@@ -10,7 +10,8 @@ interface categoryState {
   selectedCategory: EachCategory | null;
   isCategoryModalOpen: boolean;
   modalMode: "create" | "edit" | "delete";
-  openCreateModal: (category: EachCategory) => void
+  openCreateModal: () => void
+  openDeleteModal: () => void
   openCategory: () => void;
   closeCategory: () => void
 }
@@ -24,6 +25,8 @@ export const useCategoryStore =create<categoryState>((set) => ({
      modalMode: "create",
      openCreateModal: () =>
     set({ isCategoryModalOpen: true, modalMode: "create", selectedCategory: null }),
+     openDeleteModal: () =>
+    set({ isCategoryModalOpen: true, modalMode: "delete", selectedCategory: null }),
     openCategory: () => set({isCategoryModalOpen: true, }),
     closeCategory: () => set({isCategoryModalOpen: false})
 }))

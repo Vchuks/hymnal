@@ -60,6 +60,17 @@ export default function HymnTable() {
   const deleteHymn = useDeleteHymn();
   const { user } = useAuthStore();
 
+  const mobileCols =
+    user?.role === "admin"
+      ? "grid-cols-[56px_220px_80px_120px_160px_80px]"
+      : "grid-cols-[56px_220px_80px_120px_160px]";
+
+  // Config for desktop screens (your explicit pixel layout)
+  const desktopCols =
+    user?.role === "admin"
+      ? "lg:grid-cols-[56px_1fr_80px_120px_160px_80px]"
+      : "lg:grid-cols-[56px_1fr_80px_120px_160px]";
+
   const filtered = useMemo(() => {
     let list = [...hymns];
 
@@ -162,7 +173,7 @@ export default function HymnTable() {
       >
         {/* Table header */}
         <div
-          className="grid grid-box text-xs font-medium uppercase tracking-widest select-none"
+          className={`grid grid-box ${mobileCols} ${desktopCols} text-xs font-medium uppercase tracking-widest select-none`}
           style={{
             borderBottom: "1px solid var(--rule)",
             background: "var(--parchment)",
@@ -378,10 +389,19 @@ function HymnRow({
     text: "#374151",
   };
   const { user } = useAuthStore();
+  const mobileCols =
+    user?.role === "admin"
+      ? "grid-cols-[56px_220px_80px_120px_160px_80px]"
+      : "grid-cols-[56px_220px_80px_120px_160px]";
 
+  // Config for desktop screens (your explicit pixel layout)
+  const desktopCols =
+    user?.role === "admin"
+      ? "lg:grid-cols-[56px_1fr_80px_120px_160px_80px]"
+      : "lg:grid-cols-[56px_1fr_80px_120px_160px]";
   return (
     <div
-      className="grid grid-box items-center row-enter transition-colors group"
+      className={`grid grid-box ${mobileCols} ${desktopCols} items-center row-enter transition-colors group`}
       style={{
         padding: "0 16px",
         opacity: isDeleting ? 0.4 : 1,

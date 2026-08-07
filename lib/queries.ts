@@ -10,15 +10,17 @@ import {
   getCategories,
   createCategory,
   deleteCategory,
+  updateAdminUser,
 } from "@/lib/api";
 import { Hymn, LoginCredentials, LoginResponse } from "@/types";
-import { useAuthStore } from "@/store/userStore";
+import { EachAdmin, useAuthStore } from "@/store/userStore";
 import { useRouter } from "next/navigation";
 import { EachCategory, useCategoryStore } from "@/store/categoryStore";
 import { useEffect } from "react";
 
 export const HYMNS_KEY = ["hymns"] as const;
 export const CATEGORY_KEY = ["categories"] as const;
+export const ADMIN_KEY = ["admin"] as const;
 
 //auth
 export function login() {
@@ -28,6 +30,9 @@ export function login() {
   return useMutation<LoginResponse, Error, LoginCredentials>({
     mutationFn: ({ username, password }) => loginUser(username, password),
     onSuccess: (data) => {
+      if(!data?.token) {
+        throw new Error(`Login failed: ${data}`);
+      }
       setUser(data);
       if (data?.role === "admin") {
         router.prefetch("/dashboard")
@@ -49,10 +54,10 @@ export function login() {
 export function useUpdateAdmin() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Omit<EachCategory, "_id">) => createCategory(data),
-    onSuccess: (category) => {
-      qc.setQueryData<Hymn[]>(CATEGORY_KEY, (old = []) => [...old, category]);
-      qc.invalidateQueries({ queryKey: CATEGORY_KEY });
+    mutationFn: (data: Omit<EachAdmin, "_id">) => updateAdminUser(data),
+    onSuccess: (user) => {
+      qc.setQueryData(ADMIN_KEY, () => user);
+      qc.invalidateQueries({ queryKey: ADMIN_KEY });
     },
   });
 }

@@ -2,6 +2,7 @@ import { apiHeader, baseUrl } from "@/constants/config";
 import { Hymn, LoginResponse } from "@/types";
 import { toast } from "react-toastify";
 import { EachCategory } from "@/store/categoryStore";
+import { EachAdmin } from "@/store/userStore";
 
 export async function loginUser(
   username: string,
@@ -15,15 +16,53 @@ export async function loginUser(
       password,
     }),
   });
-  if (!res.ok) throw new Error("Login failed!");
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    toast.error(errorData || `Failed to login: ${res.status}`, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+    throw new Error("Login failed!");
+  }
   const data = await res.json();
-  localStorage.setItem("user", JSON.stringify(data));
+  if (data.token) {
+    localStorage.setItem("user", JSON.stringify(data));
+  }
   return data;
 }
 
-// export async function updateAdminUser(){
+export async function updateAdminUser(
+  data: Omit<EachAdmin, "_id">,
+): Promise<EachAdmin> {
+  const res = await fetch(`${baseUrl}/auth/me`, {
+    method: "PUT",
+    headers: apiHeader(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
 
-// }
+    toast.error(errorData.error || `Failed to update admin: ${res.status}`, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+
+    throw new Error(
+      errorData.message || `Failed to update admin: ${res.status}`,
+    );
+  }
+
+  const result = await res.json();
+  if (result.message) {
+    toast.success(result.message, {
+      position: "top-right",
+      autoClose: 3000,
+    });
+  } else {
+    toast.error(result);
+  }
+  return result;
+}
 
 export async function fetchHymns(): Promise<Hymn[]> {
   const res = await fetch(`${baseUrl}/hymn`, {
@@ -93,7 +132,7 @@ export async function updateHymn(
 }
 
 export async function deleteHymn(id: string): Promise<void> {
-   const res = await fetch(`${baseUrl}/hymn/${id}`, {
+  const res = await fetch(`${baseUrl}/hymn/${id}`, {
     method: "DELETE",
     headers: apiHeader(),
   });
@@ -120,7 +159,7 @@ export async function createCategory(data: Omit<EachCategory, "_id">) {
   const res = await fetch(`${baseUrl}/category`, {
     method: "POST",
     headers: apiHeader(),
-    body: JSON.stringify(data),
+    body: JSON.stringify({name:data.name}),
   });
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
@@ -152,7 +191,7 @@ export async function getCategories() {
 }
 
 export async function deleteCategory(id: string): Promise<void> {
-   const res = await fetch(`${baseUrl}/category/${id}`, {
+  const res = await fetch(`${baseUrl}/category/${id}`, {
     method: "DELETE",
     headers: apiHeader(),
   });

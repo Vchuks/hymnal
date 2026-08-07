@@ -30,8 +30,8 @@ const CategoryModal = () => {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      if (!form.name.trim()) return;
       if (modalMode === "create") {
+        if (!form.name.trim()) return;
         await createCategory.mutateAsync(form);
       } else {
         const deleteId = form._id;
@@ -201,7 +201,7 @@ const CategoryModal = () => {
               <select
                     value={form._id}
                     onChange={(e) =>
-                      setForm((f) => ({ ...f, category: e.target.value }))
+                      setForm((f) => ({ ...f, _id: e.target.value }))
                     }
                     className="w-full rounded-lg px-3 py-2.5 text-sm"
                     style={{
