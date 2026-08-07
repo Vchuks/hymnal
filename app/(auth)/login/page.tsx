@@ -108,7 +108,7 @@ const Login = () => {
               )}
             </button>
           </div>
-<a href="/hymns">Switch to normal user?</a>
+<a href="/hymns" className="pt-2 text-center">Switch to normal user?</a>
           {isError && (
             <div className="p-2 mt-1 w-full bg-red-100 border border-red-300 text-red-700 rounded animate-shake">
               {error.message}
