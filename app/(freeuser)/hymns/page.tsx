@@ -7,11 +7,11 @@ import { useState } from "react";
 
 const UserDashboard = () => {
   const [openDropdown, setOpenDropdown] = useState<boolean>(false);
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogin = () => {
-    router.push("/login")
-  }
+    router.push("/login");
+  };
 
   return (
     <div
@@ -57,19 +57,24 @@ const UserDashboard = () => {
               color: "var(--ink-muted)",
               border: "1px solid var(--rule)",
             }}
-            >
+          >
             <div
-            className="flex items-center justify-between"
-            onClick={() => setOpenDropdown(!openDropdown)}
+              className="flex items-center justify-between"
+              onClick={() => setOpenDropdown(!openDropdown)}
             >
-              
-            v1.0
-            <ChevronDown size={20} className="ml-3"/>
+              v1.0
+              <ChevronDown size={20} className="ml-3" />
             </div>
-          {openDropdown && <div className="w-36 absolute  bg-white shadow-sm px-5 py-3 -bottom-14 md:-bottom-16 -right-2 rounded-b-lg ">
-          <p className="cursor-pointer text-base font-bold" onClick={handleLogin}>Admin Login</p>
-           
-        </div>}
+            {openDropdown && (
+              <div className="w-28 lg:w-36 absolute  bg-white shadow-sm px-3 lg:px-5 py-3 -bottom-14 md:-bottom-16 -right-2 rounded-b-lg ">
+                <p
+                  className="cursor-pointer text-sm lg:text-base font-bold"
+                  onClick={handleLogin}
+                >
+                  Admin Login
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -92,7 +97,6 @@ const UserDashboard = () => {
           </p>
         </div>
 
-
         {/* Toolbar */}
         <HymnToolbar />
 
@@ -100,8 +104,6 @@ const UserDashboard = () => {
 
         <HymnCardFree />
       </main>
-
-      
     </div>
   );
 };

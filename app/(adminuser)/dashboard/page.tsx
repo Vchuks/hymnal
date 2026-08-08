@@ -1,28 +1,28 @@
-"use client"
-import AdminModal from "@/components/AdminModal"
-import CategoryModal from "@/components/CategoryModal"
-import HymnModal from "@/components/HymnModal"
-import HymnStats from "@/components/HymnStats"
-import HymnTable from "@/components/HymnTable"
-import HymnToolbar from "@/components/HymnToolbar"
-import { useDeleteCategory } from "@/lib/queries"
-import { EachCategory, useCategoryStore } from "@/store/categoryStore"
-import { useAuthStore } from "@/store/userStore"
-import { useQueryClient } from "@tanstack/react-query"
-import { ChevronDown, Music4 } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+"use client";
+import AdminModal from "@/components/AdminModal";
+import CategoryModal from "@/components/CategoryModal";
+import HymnModal from "@/components/HymnModal";
+import HymnStats from "@/components/HymnStats";
+import HymnTable from "@/components/HymnTable";
+import HymnToolbar from "@/components/HymnToolbar";
+import { useDeleteCategory } from "@/lib/queries";
+import { EachCategory, useCategoryStore } from "@/store/categoryStore";
+import { useAuthStore } from "@/store/userStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { ChevronDown, Music4 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 const AdminDashboard = () => {
-  const [openDropdown, setOpenDropdown] = useState<boolean>(false)
-  const {openAdmin} = useAuthStore()
-  const {openDeleteModal} = useCategoryStore()
-  const logout = useAuthStore(state=>state.logout)
-  const router = useRouter()
-  const queryClient = useQueryClient()
+  const [openDropdown, setOpenDropdown] = useState<boolean>(false);
+  const { openAdmin } = useAuthStore();
+  const { openDeleteModal } = useCategoryStore();
+  const logout = useAuthStore((state) => state.logout);
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const dropdownRef = useRef<HTMLUListElement | null>(null);
 
-   useEffect(() => {
+  useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -35,7 +35,7 @@ const AdminDashboard = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-const handleLogout = () => {
+  const handleLogout = () => {
     // 1. Clear the entire TanStack Query cache in memory
     queryClient.clear();
 
@@ -46,7 +46,7 @@ const handleLogout = () => {
     router.replace("/login");
   };
   return (
-     <div
+    <div
       className="min-h-screen"
       style={{ background: "var(--parchment-gold)" }}
     >
@@ -55,7 +55,7 @@ const handleLogout = () => {
         style={{
           borderBottom: "1px solid var(--rule)",
           background: "white",
-          position: "relative"
+          position: "relative",
         }}
       >
         <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
@@ -89,24 +89,41 @@ const handleLogout = () => {
               color: "var(--ink-muted)",
               border: "1px solid var(--rule)",
             }}
-            >
+          >
             <div
-            className="flex items-center justify-between"
-            onClick={() => setOpenDropdown(!openDropdown)}
+              className="flex items-center justify-between"
+              onClick={() => setOpenDropdown(!openDropdown)}
             >
-              
-            v1.0
-            <ChevronDown size={20} className="ml-3"/>
+              v1.0
+              <ChevronDown size={20} className="ml-3" />
             </div>
-          {openDropdown && <ul ref={dropdownRef} className="absolute block bg-white shadow-sm list-disc px-5 py-3 -bottom-32 -right-2 rounded-b-lg w-44 space-y-2">
-          <li onClick={openAdmin} className="cursor-pointer text-base xl:text-lg" >Update Admin</li>
-          <li onClick={openDeleteModal} className="cursor-pointer text-base xl:text-lg" >Delete Category</li>
-          <li className="cursor-pointer text-base xl:text-lg" onClick={handleLogout}>Logout</li>
-           
-        </ul>}
+            {openDropdown && (
+              <ul
+                ref={dropdownRef}
+                className="absolute block bg-white shadow-sm list-disc px-3 lg:px-5 py-3 -bottom-28 list-inside lg:-bottom-32 -right-2 rounded-b-lg w-40 lg:w-48 space-y-2"
+              >
+                <li
+                  onClick={openAdmin}
+                  className="cursor-pointer text-sm lg:text-base"
+                >
+                  Update Admin
+                </li>
+                <li
+                  onClick={openDeleteModal}
+                  className="cursor-pointer text-sm lg:text-base"
+                >
+                  Delete Category
+                </li>
+                <li
+                  className="cursor-pointer text-sm lg:text-base"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </li>
+              </ul>
+            )}
           </div>
         </div>
-        
       </header>
 
       {/* Main */}
@@ -134,18 +151,16 @@ const handleLogout = () => {
         <HymnToolbar />
 
         {/* Table */}
-        
-          <HymnTable />
-        
+
+        <HymnTable />
       </main>
 
       {/* Modal (portal) */}
       <HymnModal />
-      <CategoryModal/>
-      <AdminModal/>
-      
+      <CategoryModal />
+      <AdminModal />
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;

@@ -8,17 +8,17 @@ import React, { useState } from "react";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const {mutateAsync, isPending, isError, error} = login()
-  const router = useRouter()
+  const { mutateAsync, isPending, isError, error } = login();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!username || !password) {
       return;
     }
 
     try {
-      await mutateAsync({username, password});
+      await mutateAsync({ username, password });
     } catch (error) {
       throw error;
     }
@@ -34,15 +34,13 @@ const Login = () => {
     <div className="bg-gray-800/10 h-screen pt-24 lg:pt-16">
       <div className="w-11/12 lg:w-2/4 px-4 py-5 bg-white font-inter rounded-2xl m-auto">
         <h2 className="w-fit font-inter m-auto pt-2 pb-1 bg-clip-text text-transparent bg-gradient-to-br from-[#222057] to-[#F8991D] to-80% font-[900] text-xl text-center animate-pulse">
-          Sing Praises - 
-        <span className="text-2xl"> To the Lord!</span>
+          Sing Praises -<span className="text-2xl"> To the Lord!</span>
         </h2>
-        <p className="text-center text-sm opacity-80">
-          Login to your account
-        </p>
+        <p className="text-center text-sm opacity-80">Login to your account</p>
 
-        <form className="flex flex-col gap-2 pt-3 md:p-10" 
-              onSubmit={handleSubmit}
+        <form
+          className="flex flex-col gap-2 pt-3 md:p-10"
+          onSubmit={handleSubmit}
         >
           <div className="flex flex-col my-2 transform hover:scale-105 transition-transform duration-200">
             <label htmlFor="username" className="font-medium text-sm pb-2">
@@ -82,7 +80,6 @@ const Login = () => {
             </div>
           </div>
 
-          
           <div className="flex flex-col items-center">
             <button
               className={`
@@ -95,7 +92,7 @@ const Login = () => {
                     : "cursor-pointer"
                 }
               `}
-              style={{background: "var(--gold-dark)"}}
+              style={{ background: "var(--gold-dark)" }}
               disabled={isPending}
             >
               {isPending ? (
@@ -108,7 +105,9 @@ const Login = () => {
               )}
             </button>
           </div>
-<a href="/hymns" className="pt-2 text-center">Switch to normal user?</a>
+          <a href="/hymns" className="pt-2 text-center">
+            Switch to normal user?
+          </a>
           {isError && (
             <div className="p-2 mt-1 w-full bg-red-100 border border-red-300 text-red-700 rounded animate-shake">
               {error.message}
